@@ -51,6 +51,14 @@ public class SkinFileHandler implements HttpHandler {
     }
 
     void get_skin(HttpExchange exchange) throws IOException {
+
+        if((!exchange.getRequestMethod().equals("GET")) && (!exchange.getRequestMethod().equals("HEAD"))){
+            Omss.logger.warn("意料外的皮肤文件请求方法: "+exchange.getRequestMethod());
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_METHOD, -1);
+            exchange.close();
+            return;
+        }
+
         String session_id = exchange.getRequestURI().getPath().substring(19,exchange.getRequestURI().getPath().length()-4);
         Session session = Session.Session_list.get(session_id);
         if(session==null){
@@ -67,9 +75,19 @@ public class SkinFileHandler implements HttpHandler {
             return_json(msg,exchange);
             return;
         }
+
         // 响应头
         exchange.getResponseHeaders().set("Content-Type", "image/png");
-        exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=" + session_id+".png");
+        exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"skin.png\"");
+
+        // 处理HEAD请求
+        if (exchange.getRequestMethod().equalsIgnoreCase("HEAD")) {
+            // 响应文件大小
+            exchange.getResponseHeaders().set("Content-Length", String.valueOf(session.skin_file.length));
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK,-1);
+            exchange.close();
+            return;
+        }
 
         // 文件长度
         exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, session.skin_file.length);
