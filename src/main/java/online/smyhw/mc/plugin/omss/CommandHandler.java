@@ -23,7 +23,7 @@ public final class CommandHandler implements SimpleCommand {
         Session se = new Session(playerName);
         Component res = Component.text()
                 .content("皮肤更新会话已创建，点击这里打开！")
-                .color(NamedTextColor.AQUA).clickEvent(ClickEvent.clickEvent(ClickEvent.Action.OPEN_URL,Omss.config.public_prefix+"?session="+se.sessionId)).build();
+                .color(NamedTextColor.AQUA).clickEvent(ClickEvent.openUrl(Omss.config.public_prefix+"?session="+se.sessionId)).build();
         source.sendMessage(res);
     }
 
